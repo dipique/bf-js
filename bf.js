@@ -1,18 +1,12 @@
 'use strict'
 
-const DATA_LEN_EXP = 15 //array length will be 2^n where n is this value (e.g. 8->256, 16->65536)
+const DATA_LEN = 30_000 //length of data array
 const EOF_CODE = -1     //the value that signifies that input is no longer being entered
 const MAX_INSTRUCTIONS_EXECUTED = 64_000_000 //upper limit on instructions to avoid infinite loops,
                                              //but should really just make compile() async and set a timeout
-const getZeroArray = len_exp => {
-    let retVal = [0]
-    for (let x = 0; x < len_exp; x++) //is there a clever way to use reduce instead of this loop?
-        retVal = retVal.concat(retVal)
-    return retVal
-}
 
 const compile = (txt, getChar) => {
-    let data = getZeroArray(DATA_LEN_EXP),
+    let data = new Uint8Array(DATA_LEN).fill(0),
         dataPtr = 0,
         instrPtr = 0,
         output = [], //built one character at a time, then returned at the end joined as a string
