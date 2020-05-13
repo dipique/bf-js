@@ -1,0 +1,48 @@
+<html>
+    <head>
+        <link href="./style.css" rel="stylesheet" />
+        <script src="./bf.js"></script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const getInput = () => {
+                    const el = document.getElementById('txtInput')
+                    if (!el.value) return
+                    const retVal = el.value[0]
+                    el.value = el.value.substring(1)
+                    return retVal
+                }
+
+                document.getElementById('btnCompile').addEventListener('click', function() {
+                    const programTxt = document.getElementById('txtProgram').value
+                    const result = compile(programTxt, getInput).trim()
+                    document.getElementById('lblResult').innerHTML = 
+                        result === '' ? 'No Result' : result
+                    document.getElementById('lblResultHex').innerHTML =
+                        result === '' ? 'x00' : strToHex(result)
+                })
+                
+                const strToHex = str => Array.from(str)
+                    .map(ch => Number(ch.charCodeAt(0)))
+                    .map(code => `x${code.toString(16).padStart(2,'0')}`)
+                    .join(' ')
+            })
+        </script>
+    </head>
+    <body>
+        <label id='myLbl' class='grid-title'>Brainfuck compiler V0.0.0.0001</label>
+        <div class='program-text'>
+            <textarea id='txtProgram' class="code-text"></textarea>
+            <button id='btnCompile'>Compile</button>
+        </div>
+        <div>
+            <label>Input is consumed from here, starting at the beginning</label>
+            <input id='txtInput' type='text' placeholder="Has to be entered up front, for now" />
+        </div>
+        <div class="result-section">
+            <label>Output</label>
+            <label id='lblResult' class="code-text code-result"></label>
+            <label id='lblResultHex' class="code-text code-result" title="Hex representation of the results (to help with invisible characters)"></label>
+        </div>        
+    </body>
+</html>
