@@ -6,13 +6,23 @@
 
         <script>
             document.addEventListener('DOMContentLoaded', () => {
-                const getInput = () => {
-                    const el = document.getElementById('txtInput')
-                    if (!el.value) return
-                    const retVal = el.value[0]
-                    el.value = el.value.substring(1)
-                    return retVal
-                }
+                const inputEl = document.getElementById('txtInput')
+                const getInput = () => new Promise(function(resolve, reject) {
+                    if (!inputEl.value) {
+                        inputEl.classList.add('input-needed')
+                        inputEl.focus()
+                        inputEl.addEventListener('onkeypress', function(e) {
+                            if (!resolve) return
+                            e.preventDefault()
+                            resolve(e.keyCode === 13 ? '' : String.fromCharCode(e.keyCode))
+                            inputEl.classList.remove('input-needed')
+                        })
+                    } else {
+                        const retVal = inputEl.value[0]
+                        inputEl.value = inputEl.value.substring(1)
+                        resolve(retVal)
+                    }
+                })
 
                 let output = ''
 
@@ -36,10 +46,10 @@
                     document.getElementById('txtProgram').value = removed
                 })
 
-                document.getElementById('btnCompile').addEventListener('click', function() {
+                document.getElementById('btnCompile').addEventListener('click', async function() {
                     const programTxt = document.getElementById('txtProgram').value
                     output = ''
-                    compile(programTxt, getInput, onOutput)
+                    await compile(programTxt, getInput, onOutput)
                 })
                 
                 const strToHex = str => Array.from(str)

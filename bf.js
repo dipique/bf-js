@@ -5,7 +5,7 @@ const EOF_CODE = -1     //the value that signifies that input is no longer being
 const MAX_INSTRUCTIONS_EXECUTED = 1_000_000_000 //upper limit on instructions to avoid infinite loops,
                                                 //but should really just make compile() async and set a timeout
 
-const compile = (txt, getChar, putChar) => {
+const compile = async (txt, getChar, putChar) => {
     let data = new Int8Array(DATA_LEN).fill(0),
         dataPtr = 0,
         instrPtr = 0,
@@ -18,7 +18,7 @@ const compile = (txt, getChar, putChar) => {
         '+': () => data[dataPtr]++,
         '-': () => data[dataPtr]--,
         '.': () => putChar(String.fromCharCode(Math.max(0, getData()))),
-        ',': () => data[dataPtr] = charToAscii(getChar() || EOF_CODE),
+        ',': async () => data[dataPtr] = charToAscii(await getChar() || EOF_CODE),
         '[': () => { if (getData() === 0) instrPtr = findMatchingBrace(txt, instrPtr) },
         ']': () => { if (getData() !== 0) instrPtr = findMatchingBrace(txt, instrPtr) }
     }
@@ -29,7 +29,14 @@ const compile = (txt, getChar, putChar) => {
                 throw 'MAX_EXECUTION_COUNT EXCEEDED'
             
             const instruction = instructions[txt[instrPtr]]
-            if (instruction) instruction()
+            if (instruction)
+            {
+                if (instruction.constructor.name === "AsyncFunction")
+                    await instruction()
+                else 
+                    instruction()
+            }
+            
         }
     } catch(e) {
         putChars(`CRASHED @ CHAR ${instrPtr}: '${e}'`)
