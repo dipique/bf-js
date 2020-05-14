@@ -2,8 +2,8 @@
 
 const DATA_LEN = 30_000 //length of data array
 const EOF_CODE = -1     //the value that signifies that input is no longer being entered
-const MAX_INSTRUCTIONS_EXECUTED = 64_000_000 //upper limit on instructions to avoid infinite loops,
-                                             //but should really just make compile() async and set a timeout
+const MAX_INSTRUCTIONS_EXECUTED = 1_000_000_000 //upper limit on instructions to avoid infinite loops,
+                                                //but should really just make compile() async and set a timeout
 
 const compile = (txt, getChar) => {
     let data = new Uint8Array(DATA_LEN).fill(0),
