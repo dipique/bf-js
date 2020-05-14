@@ -14,6 +14,7 @@ label {
 
 input {
     width: 100%;
+    box-sizing: border-box;
 }
 
 .grid-title {
@@ -28,6 +29,7 @@ input {
     width: 100%;
     height: 10em;
     margin: .2em;
+    box-sizing: border-box;
 }
 
 .program-text button {
