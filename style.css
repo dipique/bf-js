@@ -7,6 +7,10 @@ body {
     font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
 }
 
+a {
+    font-size: small;
+}
+
 label {
     height: 1em;
     width: 100%;
