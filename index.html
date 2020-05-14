@@ -14,6 +14,12 @@
                     return retVal
                 }
 
+                document.getElementById('btnRemoveUnused').addEventListener('click', function() {
+                    const programTxt = document.getElementById('txtProgram').value
+                    const removed = removeUnusedCharacters(programTxt)
+                    document.getElementById('txtProgram').value = removed
+                })
+
                 document.getElementById('btnCompile').addEventListener('click', function() {
                     const programTxt = document.getElementById('txtProgram').value
                     const result = compile(programTxt, getInput).trim()
@@ -35,6 +41,7 @@
         <a href="https://github.com/dipique/bf-js">GitHib</a>
         <div class='program-text'>
             <textarea id='txtProgram' class="code-text"></textarea>
+            <button id='btnRemoveUnused'>Remove Unused Characters</button>
             <button id='btnCompile'>Compile</button>
         </div>
         <div>

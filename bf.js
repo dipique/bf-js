@@ -59,3 +59,5 @@ const findMatchingBrace = (txt, currentBraceIdx) => {
         currentIdx += stepAmt    
     }    
 }
+
+const removeUnusedCharacters = bfTxt => bfTxt.replace(/[^<>,.\[\]+-]/g, '')
