@@ -14,6 +14,22 @@
                     return retVal
                 }
 
+                let output = ''
+
+                const onOutput = ch => {
+                    if (!ch) return;
+                    if (!ch.replace(/\0/g,'')) return
+                    output += ch;
+                    updateOutputUI()
+                }
+
+                const updateOutputUI = () => {
+                    document.getElementById('lblResult').innerHTML = 
+                        output === '' ? 'No Result' : output
+                    document.getElementById('lblResultHex').innerHTML =
+                        output === '' ? 'x00' : strToHex(output)
+                }
+
                 document.getElementById('btnRemoveUnused').addEventListener('click', function() {
                     const programTxt = document.getElementById('txtProgram').value
                     const removed = removeUnusedCharacters(programTxt)
@@ -22,11 +38,11 @@
 
                 document.getElementById('btnCompile').addEventListener('click', function() {
                     const programTxt = document.getElementById('txtProgram').value
-                    const result = compile(programTxt, getInput).trim()
-                    document.getElementById('lblResult').innerHTML = 
-                        result === '' ? 'No Result' : result
-                    document.getElementById('lblResultHex').innerHTML =
-                        result === '' ? 'x00' : strToHex(result)
+                    output = ''
+                    const result = compile(programTxt, getInput, onOutput).trim()
+                    updateOutputUI()
+                    if (result && result.length)
+                        Array.from(result).map(ch => onOutput(ch))
                 })
                 
                 const strToHex = str => Array.from(str)
@@ -37,7 +53,7 @@
         </script>
     </head>
     <body>
-        <label id='myLbl' class='grid-title'>Brainfuck compiler V0.0.0.0001</label>
+        <label id='myLbl' class='grid-title'>Brainfuck compiler V0.0.0.0002</label>
         <a href="https://github.com/dipique/bf-js">GitHib</a>
         <div class='program-text'>
             <textarea id='txtProgram' class="code-text"></textarea>
