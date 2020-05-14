@@ -9,7 +9,6 @@ const compile = (txt, getChar, putChar) => {
     let data = new Int8Array(DATA_LEN).fill(0),
         dataPtr = 0,
         instrPtr = 0,
-        output = [], //built one character at a time, then returned at the end joined as a string
         instructionCount = 0 //my one concession to semi-proactive error handling; infinite loop detection
     const getData = idx => data[idx || dataPtr]
     const putChars = str => Array.from(str).map(ch => putChar(ch))
@@ -33,9 +32,9 @@ const compile = (txt, getChar, putChar) => {
             if (instruction) instruction()
         }
     } catch(e) {
-        return `CRASHED @ CHAR ${instrPtr}: '${e}'`
+        putChars(`CRASHED @ CHAR ${instrPtr}: '${e}'`)
     }
-    return '' //successful
+    return
 }
 
 //if the input is a string, get an ascii code; otherwise, just pass back the return.

@@ -39,10 +39,7 @@
                 document.getElementById('btnCompile').addEventListener('click', function() {
                     const programTxt = document.getElementById('txtProgram').value
                     output = ''
-                    const result = compile(programTxt, getInput, onOutput).trim()
-                    updateOutputUI()
-                    if (result && result.length)
-                        Array.from(result).map(ch => onOutput(ch))
+                    compile(programTxt, getInput, onOutput)
                 })
                 
                 const strToHex = str => Array.from(str)
