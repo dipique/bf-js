@@ -38,7 +38,7 @@ const compile = (txt, getChar) => {
     return output.join('')
 }
 
-//if the input is a string, pass get an ascii code; otherwise, just pass back the return.
+//if the input is a string, get an ascii code; otherwise, just pass back the return.
 //This logic is to allow ascii codes provided directly (like EOF) to pass through untouched.
 const charToAscii = ch => Math.min(127, typeof ch === 'string' ? ch.charCodeAt(0) : ch)
 
