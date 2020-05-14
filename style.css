@@ -30,6 +30,7 @@ input {
     height: 10em;
     margin: .2em;
     box-sizing: border-box;
+    resize: vertical;
 }
 
 .program-text button {
