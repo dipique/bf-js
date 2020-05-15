@@ -1,65 +1,22 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title>Brainfuck Interpreter</title>
         <link href="./style.css" rel="stylesheet" />
         <script src="./bf.js"></script>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const getInput = () => {
-                    const el = document.getElementById('txtInput')
-                    if (!el.value) return
-                    const retVal = el.value[0]
-                    el.value = el.value.substring(1)
-                    return retVal
-                }
-
-                let output = ''
-
-                const onOutput = ch => {
-                    if (!ch) return;
-                    if (!ch.replace(/\0/g,'')) return
-                    output += ch;
-                    updateOutputUI()
-                }
-
-                const updateOutputUI = () => {
-                    document.getElementById('lblResult').innerHTML = 
-                        output === '' ? 'No Result' : output
-                    document.getElementById('lblResultHex').innerHTML =
-                        output === '' ? 'x00' : strToHex(output)
-                }
-
-                document.getElementById('btnRemoveUnused').addEventListener('click', function() {
-                    const programTxt = document.getElementById('txtProgram').value
-                    const removed = removeUnusedCharacters(programTxt)
-                    document.getElementById('txtProgram').value = removed
-                })
-
-                document.getElementById('btnCompile').addEventListener('click', function() {
-                    const programTxt = document.getElementById('txtProgram').value
-                    output = ''
-                    compile(programTxt, getInput, onOutput)
-                })
-                
-                const strToHex = str => Array.from(str)
-                    .map(ch => Number(ch.charCodeAt(0)))
-                    .map(code => `x${code.toString(16).padStart(2,'0')}`)
-                    .join(' ')
-            })
-        </script>
+        <script src="./ui.js"></script>
     </head>
     <body>
-        <label id='myLbl' class='grid-title'>Brainfuck compiler V0.0.0.0002</label>
+        <label id='myLbl' class='grid-title'>Brainfuck interpreter V0.0.1.0004</label>
         <a href="https://github.com/dipique/bf-js">GitHib</a>
         <div class='program-text'>
             <textarea id='txtProgram' class="code-text"></textarea>
             <button id='btnRemoveUnused'>Remove Unused Characters</button>
-            <button id='btnCompile'>Compile</button>
+            <button id='btnCompile'>Interpret</button>
         </div>
         <div>
             <label>Input is consumed from here, starting at the beginning</label>
-            <input id='txtInput' type='text' placeholder="Has to be entered up front, for now" />
+            <input id='txtInput' type='text' placeholder="I'll turn orange when a character is needed. Enter for EOL." />
         </div>
         <div class="result-section">
             <label>Output</label>

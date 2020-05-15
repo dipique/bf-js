@@ -5,36 +5,80 @@ const EOF_CODE = -1     //the value that signifies that input is no longer being
 const MAX_INSTRUCTIONS_EXECUTED = 1_000_000_000 //upper limit on instructions to avoid infinite loops,
                                                 //but should really just make compile() async and set a timeout
 
-const compile = (txt, getChar, putChar) => {
-    let data = new Int8Array(DATA_LEN).fill(0),
-        dataPtr = 0,
-        instrPtr = 0,
-        instructionCount = 0 //my one concession to semi-proactive error handling; infinite loop detection
-    const getData = idx => data[idx || dataPtr]
+const BrainFuck = function(askChar, putChar) {
+    const self = this
+    this.txt = ''
+    let dataPtr = 0
+    let instrPtr = 0
+    let instructionCount = 0 //the number of instructions that have been executed so far
+
+    const getData  = idx => self.data[idx || dataPtr]
+    const getInstr = idx => self.txt [idx || instrPtr]
     const putChars = str => Array.from(str).map(ch => putChar(ch))
+
+    let pendingInput = false
+    this.giveData = ch => { 
+        console.log(`Got data: ${ch}`)
+        self.data[dataPtr] = charToAscii(ch || EOF_CODE) 
+        pendingInput = false
+        interpreter()
+    }
+
+    //This generator is responsible for taking the program text and filtering out irrelevant characters,
+    //and also dealing with brackets control flow. It's important that each symbol be accepted and then
+    //fully dealt with before another symbol is requested.
+    function* symbolStream() {
+        while (instrPtr < self.txt.length) {
+            switch(getInstr()) {
+                case '[':
+                    if (getData() === 0) instrPtr = findMatchingBrace(self.txt, instrPtr)
+                    break
+                case ']':
+                    if (getData() !== 0) instrPtr = findMatchingBrace(self.txt, instrPtr)
+                    break
+                case '<': case '.': case '-':
+                case '>': case ',': case '+':
+                    yield getInstr()
+                default: break
+            }
+            instrPtr++
+            if (instructionCount++ > MAX_INSTRUCTIONS_EXECUTED)
+                throw 'MAX_EXECUTION_COUNT EXCEEDED'
+        }
+    }
+
     const instructions = {
         '>': () => dataPtr++,
         '<': () => dataPtr--,
-        '+': () => data[dataPtr]++,
-        '-': () => data[dataPtr]--,
+        '+': () => self.data[dataPtr]++,
+        '-': () => self.data[dataPtr]--,
         '.': () => putChar(String.fromCharCode(Math.max(0, getData()))),
-        ',': () => data[dataPtr] = charToAscii(getChar() || EOF_CODE),
-        '[': () => { if (getData() === 0) instrPtr = findMatchingBrace(txt, instrPtr) },
-        ']': () => { if (getData() !== 0) instrPtr = findMatchingBrace(txt, instrPtr) }
+        ',': () => { askChar(); pendingInput = true; console.log('requesting data'); }
     }
 
-    try {
-        for (instrPtr = 0; instrPtr < txt.length; instrPtr++) {
-            if (++instructionCount > MAX_INSTRUCTIONS_EXECUTED)
-                throw 'MAX_EXECUTION_COUNT EXCEEDED'
-            
-            const instruction = instructions[txt[instrPtr]]
-            if (instruction) instruction()
+    //this generator has no internal state, only external status, so it can be readily stopped and started again
+    function interpreter() {
+        try {
+            while (!self.pendingInput) {
+                let nextInstr = self.symStream.next()
+                if (!nextInstr || nextInstr.done) return
+                let instrCode = nextInstr.value                
+                instructions[instrCode]()
+                if (pendingInput) return
+            }
+        } catch(e) {
+            putChars(`CRASHED @ CHAR ${instrPtr}: '${e}'`)
         }
-    } catch(e) {
-        putChars(`CRASHED @ CHAR ${instrPtr}: '${e}'`)
     }
-    return
+
+    this.start = function(txt) {
+        self.data = new Int8Array(DATA_LEN).fill(0)
+        self.txt = txt
+        self.symStream = symbolStream()
+        instrPtr = 0
+        dataPtr = 0
+        interpreter()
+    }
 }
 
 //if the input is a string, get an ascii code; otherwise, just pass back the return.
